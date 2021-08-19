@@ -21,7 +21,7 @@ fi"""
     stage('Compile PetClinic') {
       steps {
         
-          sh "docker build -t petrunning ."
+          sh "docker build -t petrunning2 ."
       }
     }
 
@@ -31,7 +31,7 @@ fi"""
         sh "oc login https://localhost:8443 --username admin --password admin --insecure-skip-tls-verify=true"
         sh "oc project ${projectName} || oc new-project ${projectName}"
         sh "oc delete all --selector app=${projectName} || echo 'Unable to delete all previous openshift resources'"
-        sh "oc new-app petrunning"
+        sh "oc new-app petrunning2"
         // sh "oc expose svc/${projectName}"
       }
     }
