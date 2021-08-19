@@ -25,6 +25,20 @@ fi"""
       }
     }
 
+    stage('Deploy Container To Openshift') {
+      
+      steps {
+        sh "oc login https://localhost:8443 --username admin --password admin --insecure-skip-tls-verify=true"
+        sh "oc project ${projectName} || oc new-project ${projectName}"
+        sh "oc delete all --selector app=${projectName} || echo 'Unable to delete all previous openshift resources'"
+        sh "oc new-app petrunning"
+        sh "oc expose svc/${projectName}"
+      }
+    }
+  }
+}
+
+'''
     stage('Build add or update Petclinic configuration') {
       steps {
         sh """cd openshift
@@ -57,5 +71,8 @@ oc project ${projectName}
 oc apply -f petclinic-deploymentconfig.yaml"""
       }
     }
+   
   }
+
 }
+'''
