@@ -32,7 +32,7 @@ fi"""
         sh "oc project ${projectName} || oc new-project ${projectName}"
         sh "oc delete all --selector app=${projectName} || echo 'Unable to delete all previous openshift resources'"
         sh "oc new-app petrunning"
-        sh "oc expose svc/${projectName}"
+        // sh "oc expose svc/${projectName}"
       }
     }
   }
