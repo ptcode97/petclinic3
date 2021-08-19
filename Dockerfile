@@ -1,14 +1,14 @@
 FROM maven:3.6.3-openjdk-11 AS compile
 COPY . /usr/src/mymaven
 WORKDIR /usr/src/mymaven
-RUN mvn clean package
+RUN mvn -Dmaven.test.skip=true clean package
 
 
 
 FROM openjdk:11
 RUN wget https://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java_8.0.24-1debian9_all.deb -O /tmp/mysql-connector.deb
 RUN dpkg -i /tmp/mysql-connector.deb
-COPY --from=compile /usr/src/mymaven/target/*.jar app.jar
+COPY --from=compile /usr/src/mymaven/target/spring-petclinic-2.4.5.jar app.jar
 COPY src/main/resources/application-mysql.properties application.properties
 EXPOSE 8080
 ENV JAVA_OPTS=""
