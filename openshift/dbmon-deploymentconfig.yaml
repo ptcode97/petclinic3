@@ -1,0 +1,62 @@
+apiVersion: v1
+kind: DeploymentConfig
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: dbmon
+  name: dbmon
+spec:
+  replicas: 1
+  selector:
+    io.kompose.service: dbmon
+  strategy:
+    resources: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: dbmon
+    spec:
+      containers:
+        - args:
+            - --collect.global_status
+            - --collect.info_schema.innodb_metrics
+            - --collect.auto_increment.columns
+            - --collect.info_schema.processlist
+            - --collect.binlog_size
+            - --collect.info_schema.tablestats
+            - --collect.global_variables
+            - --collect.info_schema.query_response_time
+            - --collect.info_schema.userstats
+            - --collect.info_schema.tables
+            - --collect.perf_schema.tablelocks
+            - --collect.perf_schema.file_events
+            - --collect.perf_schema.eventswaits
+            - --collect.perf_schema.indexiowaits
+            - --collect.perf_schema.tableiowaits
+            - --collect.slave_status
+          env:
+            - name: DATA_SOURCE_NAME
+              value: exporter:promexporter123@(database:3306)/
+          image: ' '
+          name: dbmon
+          resources: {}
+      restartPolicy: Always
+  test: false
+  triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+          - dbmon
+        from:
+          kind: ImageStreamTag
+          name: dbmon:latest
+      type: ImageChange
+status:
+  availableReplicas: 0
+  latestVersion: 0
+  observedGeneration: 0
+  replicas: 0
+  unavailableReplicas: 0
+  updatedReplicas: 0

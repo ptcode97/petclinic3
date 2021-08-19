@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: moodle
+  name: moodle
+spec:
+  ports:
+    - name: "moodle1180"
+      port: 1180
+      targetPort: 8080
+    - name: "moodle1443"
+      port: 1443
+      targetPort: 8443
+    - name: "moodle9100"
+      port: 9100
+      targetPort: 9100
+    - name: "moodle9995"
+      port: 9995
+      targetPort: 9995
+    - name: "moodle9256"
+      port: 9256
+      targetPort: 9256
+  selector:
+    io.kompose.service: moodle
+status:
+  loadBalancer: {}

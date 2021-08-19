@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: database
+  name: database
+spec:
+  ports:
+    - name: "db3306"
+      port: 3306
+      targetPort: 3306
+    - name: "db9995"
+      port: 9995
+      targetPort: 9995
+    - name: "db9100"
+      port: 9100
+      targetPort: 9100
+    - name: "db9256"
+      port: 9256
+      targetPort: 9256
+  selector:
+    io.kompose.service: database
+status:
+  loadBalancer: {}

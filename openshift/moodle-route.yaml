@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Route
+metadata:
+  name: moodle
+spec:
+  host: moodle
+  port:
+    targetPort: '8080'
+  to:
+    kind: Service
+    name: moodle

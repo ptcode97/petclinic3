@@ -1,0 +1,26 @@
+kind: "BuildConfig"
+apiVersion: "v1"
+metadata:
+  name: "petclinic"
+  annotations:
+    openshift.io/build-config.name: petclinic
+  labels:
+    build: petclinic
+    buildconfig: petclinic
+    openshift.io/build-config.name: petclinic
+    openshift.io/build.start-policy: Serial
+spec:
+  source:
+    contextDir: "containers/petclinic"
+    git:
+      ref: main
+      uri: 'https://github.com/stevshil/monitoring-lab.git'
+    type: Git
+  strategy:
+   type: Docker
+   dockerStrategy:
+    dockerfilePath: .
+  output:
+    to:
+      kind: "ImageStreamTag"
+      name: "petclinic:latest"

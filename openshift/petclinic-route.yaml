@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Route
+metadata:
+  name: petclinic
+spec:
+  host: petclinic
+  port:
+    targetPort: '8080'
+  to:
+    kind: Service
+    name: petclinic

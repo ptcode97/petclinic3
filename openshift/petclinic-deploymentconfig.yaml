@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: DeploymentConfig
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: petclinic
+  name: petclinic
+spec:
+  replicas: 1
+  selector:
+    io.kompose.service: petclinic
+  strategy:
+    resources: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: petclinic
+    spec:
+      containers:
+        - env:
+            - name: DBPASSWORD
+              value: petclinic
+            - name: DBSERVERNAME
+              value: database
+            - name: DBUSERNAME
+              value: root
+          image: ' '
+          name: petclinic
+          ports:
+            - containerPort: 8080
+          resources: {}
+      restartPolicy: Always
+  test: false
+  triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+          - petclinic
+        from:
+          kind: ImageStreamTag
+          name: petclinic:latest
+      type: ImageChange
+status:
+  availableReplicas: 0
+  latestVersion: 0
+  observedGeneration: 0
+  replicas: 0
+  unavailableReplicas: 0
+  updatedReplicas: 0

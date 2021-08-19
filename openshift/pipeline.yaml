@@ -1,0 +1,143 @@
+apiVersion: v1
+kind: BuildConfig
+metadata:
+  name: pipeline
+spec:
+  strategy:
+    jenkinsPipelineStrategy:
+      jenkinsfile: |-
+        pipeline {
+          agent none
+          stages {
+            stage("Create Project Environment") {
+              agent {label 'maven'}
+              stages {
+                stage("Clone Source") {
+                  steps {
+                    checkout([$class: 'GitSCM',
+                                branches: [[name: "*/master"]],
+                                extensions: [
+                                  [$class: 'RelativeTargetDirectory', relativeTargetDir: 'environment']
+                                ],
+                    userRemoteConfigs: [[url: "https://github.com/stevshil/docker.git"]]
+                            ])
+                  }
+                }
+                stage("Create/Update Database Deployment Config") {
+                  steps {
+                    dir('openshift') {
+                      sh 'oc apply -f db-data-persistentvolumeclaim.yaml'
+                      sh 'oc apply -f database-deploymentconfig.yaml'
+                      sh 'oc apply -f database-imagestream.yaml'
+                      sh 'oc apply -f database-service.yaml'
+                    }
+                  }
+                }
+                stage("Create/Update PetClinic Deployment Config") {
+                  steps {
+                    dir('environment/jenkins-Openshift/ymls') {
+                      sh 'oc apply -f petclinic-deploymentconfig.yaml'
+                      sh 'oc apply -f petclinic-imagestream.yaml'
+                      sh 'oc apply -f petclinic-service.yaml'
+                      sh 'oc apply -f petclinic-route.yaml'
+                    }
+                  }
+                }
+              }
+            }
+            stage("Build PetClinic") {
+              agent {label 'maven'}
+              stages {
+                stage("Clone Source") {
+                  steps {
+                    checkout([$class: 'GitSCM',
+                                branches: [[name: "*/master"]],
+                                extensions: [
+                                  [$class: 'RelativeTargetDirectory', relativeTargetDir: 'petclinic']
+                                ],
+                    userRemoteConfigs: [[url: "https://github.com/stevshil/petclinic-docker-build.git"]]
+                            ])
+                  }
+                }
+                stage("Create Build For Petclinic") {
+                  steps {
+                    dir('petclinic') {
+                      sh 'oc new-build --strategy docker --binary --name petclinic || echo "Build already exists"'
+                    }
+                  }
+                }
+                stage("Build PetClinic Image") {
+                  steps {
+                    dir('petclinic') {
+                      sh 'ln Dockerfile.mon Dockerfile'
+                      sh 'oc start-build petclinic --follow --wait=true --from-dir .|| (echo "PetClinic BUILD FAILED" && exit 1)'
+                      sh 'rm Dockerfile'
+                    }
+                  }
+                }
+              }
+            }
+            stage("Build Database") {
+              agent {label 'maven'}
+              stages {
+                stage("Clone Source") {
+                  steps {
+                    checkout([$class: 'GitSCM',
+                                branches: [[name: "*/master"]],
+                                extensions: [
+                                  [$class: 'RelativeTargetDirectory', relativeTargetDir: 'database']
+                                ],
+                    userRemoteConfigs: [[url: "https://github.com/stevshil/docker.git"]]
+                            ])
+                  }
+                }
+                stage("Create Build For Database Server") {
+                  steps {
+                    dir('containers/database') {
+                      sh 'oc new-build --strategy docker --binary --name database || echo "Build already exists"'
+                    }
+                  }
+                }
+                stage("Build Database Image") {
+                  steps {
+                    dir('database') {
+                      sh 'oc start-build database --follow --wait=true --from-dir .|| (echo "DB BUILD FAILED" && exit 1)'
+                    }
+                  }
+                }
+              }
+            }
+            stage("Test Application") {
+              agent {label 'maven'}
+              when {
+                not { environment name: 'GITREPOTEST', value: 'false' }
+              }
+              stages {
+                stage("Clone Source") {
+                  steps {
+                    checkout([$class: 'GitSCM',
+                                branches: [[name: "*/master"]],
+                                extensions: [
+                                  [$class: 'RelativeTargetDirectory', relativeTargetDir: 'tests']
+                                ],
+                                userRemoteConfigs: [[url: "https://bitbucket.org/stevshil/petclinicmysqlopenshift"]]
+                            ])
+                  }
+                }
+                stage("Test environment") {
+                  steps {
+                    dir('tests') {
+                      sh 'echo "You should perform tests to make sure your application works"'
+                      sh 'echo "Something like a curl to a status port -  curl http://myapp.oc.local/trades/status"'
+                      sh 'echo "Or http://myapp.oc.local/trades/list"'
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+    type: JenkinsPipeline
+    triggers: {
+      pollSCM('H */2 * * 1-5')
+    }

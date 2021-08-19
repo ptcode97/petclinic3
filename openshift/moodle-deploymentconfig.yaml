@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: DeploymentConfig
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: moodle
+  name: moodle
+spec:
+  replicas: 1
+  selector:
+    io.kompose.service: moodle
+  strategy:
+    resources: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: moodle
+    spec:
+      containers:
+        - env:
+            - name: BITNAMI_DEBUG
+              value: "true"
+            - name: MOODLE_DATABASE_HOST
+              value: database
+            - name: MOODLE_DATABASE_NAME
+              value: moodle
+            - name: MOODLE_DATABASE_PASSWORD
+              value: petclinic
+            - name: MOODLE_DATABASE_USER
+              value: root
+            - name: MOODLE_PASSWORD
+              value: admin123
+            - name: MOODLE_USERNAME
+              value: admin
+            - name: MYSQL_CLIENT_DATABASE_HOST
+              value: database
+            - name: MYSQL_CLIENT_DATABASE_ROOT_PASSWORD
+              value: petclinic
+          image: ' '
+          name: moodle
+          ports:
+            - containerPort: 8080
+            - containerPort: 8443
+          resources: {}
+          volumeMounts:
+            - mountPath: /bitnami/moodledata
+              name: moodle-data
+      restartPolicy: Always
+      volumes:
+        - name: moodle-data
+          persistentVolumeClaim:
+            claimName: moodle-data
+  test: false
+  triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+          - moodle
+        from:
+          kind: ImageStreamTag
+          name: moodle:latest
+      type: ImageChange
+status:
+  availableReplicas: 0
+  latestVersion: 0
+  observedGeneration: 0
+  replicas: 0
+  unavailableReplicas: 0
+  updatedReplicas: 0

@@ -1,0 +1,26 @@
+kind: "BuildConfig"
+apiVersion: "v1"
+metadata:
+  name: "grafana"
+  annotations:
+    openshift.io/build-config.name: grafana
+  labels:
+    build: grafana
+    buildconfig: grafana
+    openshift.io/build-config.name: grafana
+    openshift.io/build.start-policy: Serial
+spec:
+  source:
+    contextDir: "containers/grafana"
+    git:
+      ref: main
+      uri: 'https://github.com/stevshil/monitoring-lab.git'
+    type: Git
+  strategy:
+   type: Docker
+   dockerStrategy:
+    dockerfilePath: .
+  output:
+    to:
+      kind: "ImageStreamTag"
+      name: "grafana:latest"

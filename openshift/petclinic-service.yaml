@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: petclinic
+  name: petclinic
+spec:
+  ports:
+    - name: "pc1080"
+      port: 1080
+      targetPort: 8080
+    - name: "pc9100"
+      port: 9100
+      targetPort: 9100
+    - name: "pc9995"
+      port: 9995
+      targetPort: 9995
+    - name: "pc9256"
+      port: 9256
+      targetPort: 9256
+  selector:
+    io.kompose.service: petclinic
+status:
+  loadBalancer: {}

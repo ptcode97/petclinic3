@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Route
+metadata:
+  name: prometheus
+spec:
+  host: prometheus
+  port:
+    targetPort: '9090'
+  to:
+    kind: Service
+    name: prometheus

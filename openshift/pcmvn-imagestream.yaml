@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ImageStream
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: maven
+  name: maven
+spec:
+  lookupPolicy:
+    local: false
+  tags:
+    - annotations: null
+      from:
+        kind: DockerImage
+        name: maven:3.6.3-jdk-11
+      generation: null
+      importPolicy: {}
+      name: "maven:3.6.3-jdk-11"
+      referencePolicy:
+        type: ""
+status:
+  dockerImageRepository: ""
