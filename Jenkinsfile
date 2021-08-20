@@ -1,8 +1,11 @@
+def projectName = 'petclinic'
+def version = "0.0.${currentBuild.number}"
+def dockerImageTag = "${projectName}:${version}"
 
 pipeline {
   agent any
   parameters {
-    string(name: 'projectName', defaultValue: 'psapp', description: 'Project name to create or target for update')
+    string(name: 'projectName', description: 'Project name to create or target for update')
   }
 
   stages {
@@ -21,7 +24,7 @@ fi"""
     stage('Compile PetClinic') {
       steps {
         
-          sh "docker build -t petrunning2 ."
+          sh "docker build -t ${dockerImageTag} ."
       }
     }
 
@@ -31,7 +34,7 @@ fi"""
         sh "oc login https://localhost:8443 --username admin --password admin --insecure-skip-tls-verify=true"
         sh "oc project ${projectName} || oc new-project ${projectName}"
         sh "oc delete all --selector app=${projectName} || echo 'Unable to delete all previous openshift resources'"
-        sh "oc new-app petrunning2"
+        sh "oc new-app ${dockerImageTag} -l version=${version}"
         sh "oc expose svc/${projectName}"
       }
     }
