@@ -58,12 +58,7 @@ oc apply -f petclinic-route.yaml || echo 'Route already in place'"""
         sh """oc login https://localhost:8443 --username admin --password admin --insecure-skip-tls-verify=true
 find .
 cd containers/petclinic
-# Delete old build first
-oc delete buildconfigs/petclinic || echo "Already deleted PC build config"
-oc delete is/petclinic || echo "Already deleted PC image stream"
-oc delete is/openjdk || echo "Already deleted Java image stream"
-oc new-build --strategy docker --binary --docker-image openjdk:11 --name petclinic
-oc start-build petclinic --from-dir . --follow"""
+
       }
     }
     stage('Deploy PetcClinic Container To Openshift') {
