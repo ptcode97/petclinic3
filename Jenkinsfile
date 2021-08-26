@@ -4,9 +4,7 @@ def dockerImageTag = "${projectName}:${version}"
 
 pipeline {
   agent any
-  parameters {
-    string(name: 'projectName', description: 'Project name to create or target for update')
-  }
+  
 
   stages {
     stage('Create project') {
